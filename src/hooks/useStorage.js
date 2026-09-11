@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
+import { today } from '../utils/dates';
 
 const STORAGE_KEY = 'planner_data';
 
 const defaultCategories = [
-  { id: 1, name: 'Work', color: '#3498db', goal: 8 },
-  { id: 2, name: 'Study', color: '#e74c3c', goal: 2 },
-  { id: 3, name: 'House Care', color: '#2ecc71', goal: 1 },
-  { id: 4, name: 'Gym', color: '#f39c12', goal: 1 },
+  { id: 1, name: 'Work', color: '#5b6b7a', goal: 8 },
+  { id: 2, name: 'Study', color: '#8b1e2d', goal: 2 },
+  { id: 3, name: 'House Care', color: '#6b7f5e', goal: 1 },
+  { id: 4, name: 'Gym', color: '#b0813f', goal: 1 },
 ];
 
 const defaultHabits = [
@@ -16,10 +17,12 @@ const defaultHabits = [
   { id: 4, name: 'Meditate', icon: '🧘' },
 ];
 
-export function useStorage() {
+export function useStorage(selectedDate) {
   const [categories, setCategories] = useState([]);
   const [entries, setEntries] = useState([]);
   const [habits, setHabits] = useState([]);
+  const [todos, setTodos] = useState([]);
+  const [templatedDays, setTemplatedDays] = useState([]); // days already seeded from templates
   const [loading, setLoading] = useState(true);
 
   // Load from localStorage on mount
@@ -31,6 +34,8 @@ export function useStorage() {
         setCategories(data.categories || defaultCategories);
         setEntries(data.entries || []);
         setHabits(data.habits || defaultHabits);
+        setTodos(data.todos || []);
+        setTemplatedDays((data.templatedDays || []).filter(d => d >= today()));
       } catch (error) {
         console.error('Failed to load data:', error);
         setCategories(defaultCategories);
@@ -46,15 +51,43 @@ export function useStorage() {
   // Save to localStorage whenever data changes
   useEffect(() => {
     if (!loading) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ categories, entries, habits }));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ categories, entries, habits, todos, templatedDays }));
     }
-  }, [categories, entries, habits, loading]);
+  }, [categories, entries, habits, todos, templatedDays, loading]);
+
+  // Seed the selected day with each category's default time blocks, once per
+  // day. Only today is seeded; past days stay as logged and future days get
+  // seeded once they become today.
+  useEffect(() => {
+    if (loading || selectedDate !== today() || templatedDays.includes(selectedDate)) return;
+    const seeded = categories.flatMap(cat =>
+      (cat.templates || []).map(t => {
+        const [sh, sm] = t.startTime.split(':').map(Number);
+        const [eh, em] = t.endTime.split(':').map(Number);
+        return {
+          id: Date.now() + Math.random(),
+          categoryId: cat.id,
+          date: selectedDate,
+          startTime: t.startTime,
+          endTime: t.endTime,
+          duration: (eh + em / 60) - (sh + sm / 60),
+          description: '',
+          done: false,
+          completedAt: null,
+          createdAt: new Date().toISOString(),
+        };
+      })
+    );
+    if (seeded.length === 0) return;
+    setEntries(prev => [...prev, ...seeded]);
+    setTemplatedDays(prev => [...prev, selectedDate]);
+  }, [selectedDate, categories, templatedDays, loading]);
 
   const addCategory = (category) => {
     const newCategory = {
       id: Date.now(),
       ...category,
-      color: category.color || '#3498db',
+      color: category.color || '#5b6b7a',
       goal: category.goal || 1,
     };
     setCategories([...categories, newCategory]);
@@ -139,6 +172,25 @@ export function useStorage() {
     });
   };
 
+  const addTodo = (text) => {
+    const newTodo = {
+      id: Date.now() + Math.random(),
+      text,
+      done: false,
+      createdAt: new Date().toISOString(),
+    };
+    setTodos(prev => [...prev, newTodo]);
+    return newTodo;
+  };
+
+  const toggleTodo = (id) => {
+    setTodos(prev => prev.map(todo => todo.id === id ? { ...todo, done: !todo.done } : todo));
+  };
+
+  const deleteTodo = (id) => {
+    setTodos(prev => prev.filter(todo => todo.id !== id));
+  };
+
   return {
     categories,
     addCategory,
@@ -153,5 +205,9 @@ export function useStorage() {
     addHabit,
     deleteHabit,
     toggleHabit,
+    todos,
+    addTodo,
+    toggleTodo,
+    deleteTodo,
   };
 }

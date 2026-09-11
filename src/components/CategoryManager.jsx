@@ -1,9 +1,57 @@
 import React, { useState } from 'react';
 import '../styles/CategoryManager.css';
 
+// Default time blocks for one category; every new day is seeded with them.
+function TemplateEditor({ category, onUpdateCategory }) {
+  const [start, setStart] = useState('09:00');
+  const [end, setEnd] = useState('10:00');
+  const templates = category.templates || [];
+
+  const addTemplate = (e) => {
+    e.preventDefault();
+    if (!start || !end || end <= start) return;
+    onUpdateCategory(category.id, {
+      templates: [...templates, { id: Date.now(), startTime: start, endTime: end }],
+    });
+  };
+
+  const removeTemplate = (id) => {
+    onUpdateCategory(category.id, { templates: templates.filter(t => t.id !== id) });
+  };
+
+  return (
+    <div className="template-editor">
+      <span className="template-label">Default times</span>
+      <div className="template-list">
+        {templates.map(t => (
+          <span key={t.id} className="template-chip" style={{ borderColor: category.color }}>
+            {t.startTime}–{t.endTime}
+            <button
+              type="button"
+              className="template-remove"
+              onClick={() => removeTemplate(t.id)}
+              title="Remove default time"
+            >
+              ×
+            </button>
+          </span>
+        ))}
+        <form className="template-form" onSubmit={addTemplate}>
+          <input type="time" step="60" value={start} onChange={(e) => setStart(e.target.value)} />
+          <span>–</span>
+          <input type="time" step="60" value={end} onChange={(e) => setEnd(e.target.value)} />
+          <button type="submit" className="btn btn-small btn-edit" disabled={!start || !end || end <= start}>
+            + Add
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 export default function CategoryManager({ categories, onAddCategory, onUpdateCategory, onDeleteCategory }) {
   const [showForm, setShowForm] = useState(false);
-  const [formData, setFormData] = useState({ name: '', color: '#3498db', goal: 1 });
+  const [formData, setFormData] = useState({ name: '', color: '#5b6b7a', goal: 1 });
   const [editingId, setEditingId] = useState(null);
 
   const handleSubmit = (e) => {
@@ -15,7 +63,7 @@ export default function CategoryManager({ categories, onAddCategory, onUpdateCat
       } else {
         onAddCategory(formData);
       }
-      setFormData({ name: '', color: '#3498db', goal: 1 });
+      setFormData({ name: '', color: '#5b6b7a', goal: 1 });
       setShowForm(false);
     }
   };
@@ -29,7 +77,7 @@ export default function CategoryManager({ categories, onAddCategory, onUpdateCat
   const handleCancel = () => {
     setShowForm(false);
     setEditingId(null);
-    setFormData({ name: '', color: '#3498db', goal: 1 });
+    setFormData({ name: '', color: '#5b6b7a', goal: 1 });
   };
 
   return (
@@ -103,27 +151,32 @@ export default function CategoryManager({ categories, onAddCategory, onUpdateCat
         ) : (
           categories.map(category => (
             <div key={category.id} className="category-card">
-              <div className="category-info">
-                <div className="category-color" style={{ backgroundColor: category.color }}></div>
-                <div className="category-details">
-                  <h3>{category.name}</h3>
-                  <p className="goal-info">Goal: {category.goal} hours/day</p>
+              <div className="category-main">
+                <div className="category-info">
+                  <div className="category-color" style={{ backgroundColor: category.color }}></div>
+                  <div className="category-details">
+                    <h3>{category.name}</h3>
+                    <p className="goal-info">Goal: {category.goal} hours/day</p>
+                  </div>
+                </div>
+                <div className="category-actions">
+                  <button
+                    className="btn btn-small btn-edit"
+                    onClick={() => handleEdit(category)}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="btn btn-small btn-delete"
+                    onClick={() => {
+                      if (window.confirm(`Delete "${category.name}" and all its time entries?`)) onDeleteCategory(category.id);
+                    }}
+                  >
+                    Delete
+                  </button>
                 </div>
               </div>
-              <div className="category-actions">
-                <button
-                  className="btn btn-small btn-edit"
-                  onClick={() => handleEdit(category)}
-                >
-                  Edit
-                </button>
-                <button
-                  className="btn btn-small btn-delete"
-                  onClick={() => onDeleteCategory(category.id)}
-                >
-                  Delete
-                </button>
-              </div>
+              <TemplateEditor category={category} onUpdateCategory={onUpdateCategory} />
             </div>
           ))
         )}

@@ -1,17 +1,7 @@
-import React, { useMemo, useState } from 'react';
-import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer } from 'recharts';
-import DayView from './DayView';
+import React, { useMemo } from 'react';
 import '../styles/Dashboard.css';
 
-export default function Dashboard({
-  selectedDate,
-  categories,
-  entries,
-  onAddEntry,
-  onToggleDone,
-  onDeleteEntry,
-}) {
-  const [viewMode, setViewMode] = useState('day'); // 'day' or 'summary'
+export default function Dashboard({ selectedDate, categories, entries }) {
   const categoryTotals = useMemo(() => {
     const dateEntries = entries.filter(
       e => e.date === selectedDate && e.type !== 'habit' && !e.habitId
@@ -59,31 +49,8 @@ export default function Dashboard({
     return chartData.reduce((sum, item) => sum + item.goal, 0);
   }, [chartData]);
 
-  if (viewMode === 'day') {
-    return (
-      <div className="dashboard">
-        <div className="view-toggle">
-          <button className="toggle-btn active" onClick={() => setViewMode('day')}>📅 Day View</button>
-          <button className="toggle-btn" onClick={() => setViewMode('summary')}>📊 Summary</button>
-        </div>
-        <DayView
-          selectedDate={selectedDate}
-          categories={categories}
-          entries={entries}
-          onAddEntry={onAddEntry}
-          onToggleDone={onToggleDone}
-          onDeleteEntry={onDeleteEntry}
-        />
-      </div>
-    );
-  }
-
   return (
     <div className="dashboard">
-      <div className="view-toggle">
-        <button className="toggle-btn" onClick={() => setViewMode('day')}>📅 Day View</button>
-        <button className="toggle-btn active" onClick={() => setViewMode('summary')}>📊 Summary</button>
-      </div>
       <div className="dashboard-header">
         <h2>Today's Summary - {selectedDate}</h2>
         <div className="total-info">
@@ -98,44 +65,6 @@ export default function Dashboard({
       </div>
 
       <div className="dashboard-content">
-        <div className="chart-container">
-          {chartData.some(item => item.value > 0) ? (
-            <ResponsiveContainer width="100%" height={400}>
-              <PieChart>
-                <Pie
-                  data={chartData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={({ name, value, goal }) => `${name}: ${value}h/${goal}h`}
-                  outerRadius={120}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {chartData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip formatter={(value) => `${value.toFixed(1)}h`} />
-              </PieChart>
-            </ResponsiveContainer>
-          ) : (
-            <div className="empty-state">
-              {plannedTotal > 0 ? (
-                <>
-                  <p>Nothing completed yet</p>
-                  <p>{plannedTotal.toFixed(1)}h planned — tick entries off in Day View</p>
-                </>
-              ) : (
-                <>
-                  <p>No entries for this day yet</p>
-                  <p>Add some entries to see your progress!</p>
-                </>
-              )}
-            </div>
-          )}
-        </div>
-
         <div className="category-breakdown">
           <h3>Category Breakdown</h3>
           <div className="breakdown-list">

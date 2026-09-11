@@ -1,16 +1,34 @@
-# React + Vite
+# Daily Planner
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+A small personal planner: a drag-to-create day timeline, per-category daily
+goals, a todo list, habit tracking with streaks, and default time blocks that
+seed every new day. Data lives in the browser's localStorage only; there is no
+backend and nothing leaves your device.
 
-Currently, two official plugins are available:
+## Heads up
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+This is a **vibe-coded, personal-use project**. It was built quickly with an AI
+coding assistant to fit one person's routine. Expect opinionated choices, no
+tests, and no roadmap. Issues and pull requests are not being triaged.
 
-## React Compiler
+The repository is public only because GitHub Pages on a free personal account
+requires a public repo. It is not published as a product or a template, though
+you are welcome to fork it.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Running locally
 
-## Expanding the Oxlint configuration
+Requires Node 24 (see `.nvmrc`).
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+```sh
+nvm use
+npm install
+npm run dev -- --port 3000 --host
+```
+
+## Deploying
+
+Publishing a GitHub release runs `.github/workflows/deploy-pages.yml`, which
+builds the app and deploys it to GitHub Pages at
+`https://jonathanbeber.github.io/daily-planner/`. The workflow can also be run
+manually from the Actions tab. One-time setup: Settings → Pages → Source →
+"GitHub Actions".

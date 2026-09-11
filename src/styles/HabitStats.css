@@ -1,8 +1,8 @@
 .habit-stats {
-  background: #fff;
-  border-radius: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
   padding: 2rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .habit-stats-header {
@@ -11,42 +11,48 @@
   align-items: center;
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
-  border-bottom: 2px solid #f0f0f0;
+  border-bottom: 1px solid var(--border);
 }
 
 .habit-stats-header h2 {
   margin: 0;
-  font-size: 1.5rem;
-  color: #333;
+  font-size: 1.15rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--text);
 }
 
 .range-picker {
   display: flex;
   gap: 0.25rem;
-  background: #f4f4f4;
-  padding: 0.25rem;
-  border-radius: 8px;
+  background: transparent;
+  padding: 0;
+  border-radius: var(--radius);
 }
 
 .range-btn {
   padding: 0.35rem 0.8rem;
-  border: none;
-  border-radius: 6px;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
   background: transparent;
-  color: #666;
-  font-size: 0.85rem;
+  color: var(--text-light);
+  font-family: inherit;
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .range-btn:hover {
-  color: #333;
+  color: var(--text);
+  background: var(--surface-2);
 }
 
 .range-btn.active {
-  background: #fff;
-  color: #333;
-  font-weight: 600;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  background: transparent;
+  border-color: var(--border-strong);
+  color: var(--text);
+  font-weight: 500;
 }
 
 .habit-stats-list {
@@ -56,10 +62,10 @@
 }
 
 .habit-stat-card {
-  border: 1px solid #eee;
-  border-radius: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
   padding: 1.25rem;
-  background: #fcfcfc;
+  background: var(--surface);
 }
 
 .habit-stat-header {
@@ -84,8 +90,9 @@
 
 .habit-identity h3 {
   margin: 0;
-  font-size: 1.05rem;
-  color: #333;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text);
 }
 
 .habit-metrics {
@@ -100,98 +107,66 @@
 }
 
 .metric-value {
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: #333;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--text);
   line-height: 1.1;
+  font-variant-numeric: tabular-nums;
 }
 
 .metric-label {
-  font-size: 0.68rem;
-  color: #999;
+  font-size: 0.7rem;
+  color: var(--text-light);
   text-transform: uppercase;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.06em;
 }
 
 /* ---------- Heatmap ---------- */
 
-.heatmap-scroll {
-  overflow-x: auto;
-  padding-bottom: 0.5rem;
-}
-
-.heatmap {
-  display: flex;
+.heat-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
   gap: 6px;
-  min-width: fit-content;
-}
-
-.heatmap-day-labels {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  padding-top: 18px; /* clear the month row */
-  flex-shrink: 0;
-}
-
-.day-label {
-  height: 12px;
-  font-size: 0.6rem;
-  line-height: 12px;
-  color: #999;
-  text-align: right;
-  width: 22px;
-}
-
-.heatmap-body {
-  display: flex;
-  flex-direction: column;
-}
-
-.heatmap-months {
-  display: flex;
-  gap: 3px;
-  height: 18px;
-}
-
-.month-label {
-  width: 12px;
-  font-size: 0.6rem;
-  color: #999;
-  white-space: nowrap;
-  overflow: visible;
-}
-
-.heatmap-weeks {
-  display: flex;
-  gap: 3px;
-}
-
-.heatmap-week {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
+  max-width: 420px;
 }
 
 .heat-cell {
-  width: 12px;
-  height: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  aspect-ratio: 1;
   padding: 0;
   border: none;
-  border-radius: 2px;
-  background: #ebedf0;
+  border-radius: var(--radius);
+  background: var(--surface-2);
+  color: var(--text-lighter);
   cursor: pointer;
   transition: outline 0.1s;
 }
 
-.heat-cell:hover:not(:disabled) {
-  outline: 1.5px solid #555;
+.heat-cell:hover {
+  outline: 1px solid var(--border-strong);
   outline-offset: 1px;
 }
 
-.heat-cell.future {
-  background: #f7f8f9;
-  cursor: default;
+.heat-cell.done {
+  color: #fff;
+}
+
+.heat-dow {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  opacity: 0.8;
+}
+
+.heat-dom {
+  font-size: 0.9rem;
+  font-weight: 500;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
 }
 
 .heatmap-legend {
@@ -200,7 +175,7 @@
   align-items: center;
   margin-top: 0.75rem;
   font-size: 0.7rem;
-  color: #999;
+  color: var(--text-lighter);
 }
 
 .legend-scale {
@@ -212,6 +187,9 @@
 .legend-scale .heat-cell {
   cursor: default;
   display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
 }
 
 .legend-scale .heat-cell:hover {
@@ -220,7 +198,7 @@
 
 .habit-stats .empty-message {
   text-align: center;
-  color: #999;
+  color: var(--text-lighter);
   padding: 2rem;
 }
 

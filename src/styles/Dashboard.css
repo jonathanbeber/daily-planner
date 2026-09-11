@@ -1,40 +1,8 @@
 .dashboard {
-  background: white;
-  border-radius: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
   padding: 2rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  overflow: hidden;
-}
-
-.view-toggle {
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 1.5rem;
-  border-bottom: 1px solid #e0e0e0;
-  padding-bottom: 1rem;
-}
-
-.toggle-btn {
-  padding: 0.5rem 1rem;
-  border: none;
-  background: none;
-  color: #666;
-  font-size: 0.95rem;
-  cursor: pointer;
-  border-bottom: 3px solid transparent;
-  transition: all 0.2s;
-}
-
-.toggle-btn:hover {
-  color: #333;
-}
-
-.toggle-btn.active {
-  color: #4285f4;
-  border-bottom-color: #4285f4;
 }
 
 .dashboard-header {
@@ -43,13 +11,15 @@
   align-items: center;
   margin-bottom: 2rem;
   padding-bottom: 1rem;
-  border-bottom: 2px solid #f0f0f0;
+  border-bottom: 1px solid var(--border);
 }
 
 .dashboard-header h2 {
   margin: 0;
-  color: #333;
-  font-size: 1.5rem;
+  color: var(--text);
+  font-size: 1.15rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
 }
 
 .total-info {
@@ -60,53 +30,38 @@
 }
 
 .total {
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: #333;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text);
   margin: 0;
+  font-variant-numeric: tabular-nums;
 }
 
 .progress {
-  font-size: 0.95rem;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
   margin: 0;
-  padding: 0.25rem 0.75rem;
-  border-radius: 20px;
+  padding: 0.25rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-light);
 }
 
 .progress.completed {
-  background: #d4edda;
-  color: #155724;
+  border-color: var(--success);
+  color: var(--success);
 }
 
 .progress.in-progress {
-  background: #fff3cd;
-  color: #856404;
+  border-color: var(--border-strong);
+  color: var(--text-light);
 }
 
 .dashboard-content {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
-  align-items: start;
-}
-
-.chart-container {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 400px;
-  background: #fafafa;
-  border-radius: 8px;
-  padding: 1rem;
-}
-
-.empty-state {
-  text-align: center;
-  color: #999;
-}
-
-.empty-state p {
-  margin: 0.5rem 0;
+  flex-direction: column;
 }
 
 .category-breakdown {
@@ -117,8 +72,11 @@
 
 .category-breakdown h3 {
   margin: 0;
-  color: #333;
-  font-size: 1.1rem;
+  color: var(--text-light);
+  font-size: 0.72rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
 
 .breakdown-list {
@@ -128,10 +86,11 @@
 }
 
 .breakdown-item {
-  background: #fafafa;
+  background: var(--surface-2);
   padding: 1rem;
-  border-radius: 8px;
-  border-left: 4px solid #ccc;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  border-left: 3px solid var(--border-strong);
 }
 
 .item-header {
@@ -145,31 +104,33 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  font-weight: 600;
-  color: #333;
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: var(--text);
 }
 
 .item-time {
   display: flex;
   gap: 0.5rem;
-  font-size: 0.95rem;
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
 }
 
 .achieved {
-  font-weight: bold;
-  color: #2ecc71;
+  font-weight: 500;
+  color: var(--text);
 }
 
 .goal {
-  color: #999;
+  color: var(--text-lighter);
 }
 
 .progress-bar {
   display: flex;
   width: 100%;
   height: 8px;
-  background: #e0e0e0;
-  border-radius: 4px;
+  background: var(--border);
+  border-radius: 999px;
   overflow: hidden;
 }
 
@@ -181,26 +142,22 @@
 /* Striped segment = planned but not done yet */
 .progress-planned {
   height: 100%;
-  opacity: 0.45;
+  opacity: 0.35;
   transition: width 0.3s ease;
 }
 
 .total-planned {
   margin: 0;
-  font-size: 0.85rem;
-  color: #888;
+  font-size: 0.8rem;
+  color: var(--text-light);
 }
 
 .planned-time {
-  color: #aaa;
+  color: var(--text-lighter);
   font-style: italic;
 }
 
 @media (max-width: 1024px) {
-  .dashboard-content {
-    grid-template-columns: 1fr;
-  }
-
   .dashboard-header {
     flex-direction: column;
     align-items: flex-start;
@@ -209,9 +166,5 @@
 
   .total-info {
     align-items: flex-start;
-  }
-
-  .chart-container {
-    min-height: 300px;
   }
 }

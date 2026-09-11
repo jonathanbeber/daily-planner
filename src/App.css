@@ -3,14 +3,13 @@
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background: #f8f9fa;
+  background: var(--bg);
 }
 
 .app-header {
-  background: white;
-  border-bottom: 1px solid #e0e0e0;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
   padding: 1.5rem 2rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -18,8 +17,23 @@
 
 .app-header h1 {
   margin: 0;
-  font-size: 1.8rem;
-  color: #333;
+  font-size: 1.25rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.brand-icon {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  color: var(--text);
 }
 
 .date-selector {
@@ -29,38 +43,49 @@
 }
 
 .date-input {
-  padding: 0.5rem 1rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 1rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.9rem;
+}
+
+.date-input:focus {
+  outline: none;
+  border-color: var(--accent);
 }
 
 .tabs {
   display: flex;
-  background: white;
-  border-bottom: 2px solid #e0e0e0;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
   padding: 0 2rem;
-  gap: 1rem;
+  gap: 1.5rem;
 }
 
 .tab {
-  padding: 1rem 1.5rem;
+  padding: 0.9rem 0.25rem;
   background: none;
   border: none;
-  border-bottom: 3px solid transparent;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
   cursor: pointer;
-  font-size: 1rem;
-  color: #666;
-  transition: all 0.3s ease;
+  font-family: inherit;
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+  color: var(--text-light);
+  transition: color 0.2s ease, border-color 0.2s ease;
 }
 
 .tab:hover {
-  color: #333;
+  color: var(--text);
 }
 
 .tab.active {
-  color: #3498db;
-  border-bottom-color: #3498db;
+  color: var(--text);
+  border-bottom-color: var(--accent);
 }
 
 .app-main {
@@ -72,67 +97,85 @@
 /* Buttons */
 .btn {
   padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 4px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text);
   cursor: pointer;
-  font-size: 0.95rem;
-  font-weight: 500;
-  transition: all 0.2s ease;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.btn:hover {
+  background: var(--surface-2);
 }
 
 .btn-primary {
-  background: #3498db;
-  color: white;
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
 }
 
 .btn-primary:hover {
-  background: #2980b9;
+  background: #781926;
+  border-color: #781926;
 }
 
 .btn-secondary {
-  background: #95a5a6;
-  color: white;
+  background: transparent;
+  border-color: var(--border-strong);
+  color: var(--text-light);
 }
 
 .btn-secondary:hover {
-  background: #7f8c8d;
+  background: var(--surface-2);
+  color: var(--text);
 }
 
 .btn-success {
-  background: #2ecc71;
-  color: white;
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
 }
 
 .btn-success:hover {
-  background: #27ae60;
+  background: #781926;
+  border-color: #781926;
 }
 
 .btn-delete {
-  background: #e74c3c;
-  color: white;
+  background: transparent;
+  border-color: var(--border-strong);
+  color: var(--text-light);
 }
 
 .btn-delete:hover {
-  background: #c0392b;
+  background: transparent;
+  border-color: var(--danger);
+  color: var(--danger);
 }
 
 .btn-edit {
-  background: #f39c12;
-  color: white;
+  background: transparent;
+  border-color: var(--border-strong);
+  color: var(--text);
 }
 
 .btn-edit:hover {
-  background: #e67e22;
+  background: var(--surface-2);
 }
 
 .btn-small {
   padding: 0.3rem 0.8rem;
-  font-size: 0.85rem;
+  font-size: 0.78rem;
 }
 
 .btn-large {
   padding: 0.75rem 1.5rem;
-  font-size: 1rem;
+  font-size: 0.9rem;
   width: 100%;
 }
 
@@ -145,17 +188,22 @@
 
 .form-group label {
   margin-bottom: 0.5rem;
+  font-size: 0.72rem;
   font-weight: 500;
-  color: #333;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-light);
 }
 
 .form-group input,
 .form-group select,
 .form-group textarea {
-  padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 1rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.95rem;
   font-family: inherit;
 }
 
@@ -163,8 +211,8 @@
 .form-group select:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: #3498db;
-  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+  border-color: var(--accent);
+  box-shadow: none;
 }
 
 .form-row {
@@ -176,8 +224,9 @@
 /* Common styles */
 .empty-message {
   text-align: center;
-  color: #999;
+  color: var(--text-lighter);
   padding: 2rem;
+  font-size: 0.9rem;
 }
 
 .color-dot {
@@ -195,7 +244,7 @@
   }
 
   .app-header h1 {
-    font-size: 1.5rem;
+    font-size: 1.15rem;
   }
 
   .tabs {
@@ -204,7 +253,7 @@
   }
 
   .tab {
-    padding: 0.75rem 1rem;
+    padding: 0.75rem 0.25rem;
     white-space: nowrap;
   }
 

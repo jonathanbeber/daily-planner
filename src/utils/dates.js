@@ -11,6 +11,13 @@ export function today() {
   return toLocalISO(new Date());
 }
 
+// Parse a YYYY-MM-DD string into a local Date. `new Date('2026-09-01')` would
+// read it as UTC midnight, which lands on the previous day west of UTC.
+function fromLocalISO(iso) {
+  const [y, m, d] = iso.split('-').map(Number);
+  return new Date(y, m - 1, d);
+}
+
 export function addDays(date, days) {
   const next = new Date(date);
   next.setDate(next.getDate() + days);
@@ -19,30 +26,9 @@ export function addDays(date, days) {
 
 export const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-export const MONTH_LABELS = [
-  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
-];
-
-/**
- * Build a GitHub-style grid: an array of weeks, each week an array of 7 Dates
- * (Sunday first). The final week contains `endDate`.
- */
-export function buildCalendarWeeks(endDate, weeksCount = 53) {
-  const end = new Date(endDate);
-  // Walk forward to the Saturday that closes the final week.
-  const lastSaturday = addDays(end, 6 - end.getDay());
-  const cursor = addDays(lastSaturday, -(weeksCount * 7 - 1));
-
-  const weeks = [];
-  for (let w = 0; w < weeksCount; w++) {
-    const week = [];
-    for (let d = 0; d < 7; d++) {
-      week.push(addDays(cursor, w * 7 + d));
-    }
-    weeks.push(week);
-  }
-  return weeks;
+/** The `count` calendar days ending on (and including) `endDate`, oldest first. */
+export function buildDayRange(endDate, count) {
+  return Array.from({ length: count }, (_, i) => addDays(endDate, i - (count - 1)));
 }
 
 /**
@@ -67,7 +53,7 @@ export function computeStreaks(completedSet, endDate = new Date()) {
   const sorted = [...completedSet].sort();
   let prev = null;
   for (const day of sorted) {
-    if (prev && toLocalISO(addDays(new Date(prev), 1)) === day) {
+    if (prev && toLocalISO(addDays(fromLocalISO(prev), 1)) === day) {
       run++;
     } else {
       run = 1;

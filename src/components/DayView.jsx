@@ -3,6 +3,7 @@ import '../styles/DayView.css';
 
 const HOUR_HEIGHT = 60; // pixels per hour
 const SNAP_MINUTES = 15;
+const DEFAULT_START_HOUR = 7; // grid opens scrolled to this hour
 const LONG_PRESS_MS = 250; // touch: hold this long before a drag starts
 const MOVE_TOLERANCE = 10; // px of movement that still counts as a tap
 
@@ -12,6 +13,13 @@ function toTimeString(hoursFloat) {
   const h = Math.floor(totalMinutes / 60) % 24;
   const m = totalMinutes % 60;
   return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+}
+
+// Convert "09:15" to fractional hours (e.g. 9.25); NaN if unparseable
+function fromTimeString(value) {
+  const [h, m] = (value || '').split(':').map(Number);
+  if (!Number.isInteger(h) || !Number.isInteger(m)) return NaN;
+  return h + m / 60;
 }
 
 // Is this slot in the past? Used to decide the planned/done default.
@@ -31,6 +39,7 @@ export default function DayView({
   categories,
   entries,
   onAddEntry,
+  onUpdateEntry,
   onToggleDone,
   onDeleteEntry,
 }) {
@@ -38,11 +47,15 @@ export default function DayView({
   const [dragEnd, setDragEnd] = useState(null);
   const [isArmed, setIsArmed] = useState(false); // drag actively selecting
   const [pendingEntry, setPendingEntry] = useState(null); // { start, end } -> opens modal
+  const [editingId, setEditingId] = useState(null); // entry being edited, null when creating
   const [draftCategoryId, setDraftCategoryId] = useState('');
+  const [draftStart, setDraftStart] = useState(''); // "HH:MM"
+  const [draftEnd, setDraftEnd] = useState('');
   const [draftDescription, setDraftDescription] = useState('');
   const [draftDone, setDraftDone] = useState(false);
 
   const gridRef = useRef(null);
+  const bodyRef = useRef(null);
   // Mutable pointer bookkeeping; refs avoid stale closures in native listeners.
   const gesture = useRef({
     pointerId: null,
@@ -71,14 +84,31 @@ export default function DayView({
 
   const openModal = useCallback(
     (start, end) => {
+      setEditingId(null);
       setPendingEntry({ start, end });
       setDraftCategoryId(categories[0]?.id ?? '');
+      setDraftStart(toTimeString(start));
+      // A drag to the bottom edge gives end = 24, which has no "24:00" input value
+      setDraftEnd(end >= 24 ? '23:59' : toTimeString(end));
       setDraftDescription('');
       // Past blocks are probably being logged; future blocks are being planned.
       setDraftDone(isPast(selectedDate, end));
     },
     [categories, selectedDate]
   );
+
+  const openEditor = (entry) => {
+    setEditingId(entry.id);
+    setPendingEntry({
+      start: fromTimeString(entry.startTime),
+      end: fromTimeString(entry.endTime),
+    });
+    setDraftCategoryId(entry.categoryId);
+    setDraftStart(entry.startTime);
+    setDraftEnd(entry.endTime);
+    setDraftDescription(entry.description || '');
+    setDraftDone(entry.done ?? true);
+  };
 
   const resetGesture = () => {
     const g = gesture.current;
@@ -189,6 +219,11 @@ export default function DayView({
     return () => el.removeEventListener('touchmove', onTouchMove);
   }, []);
 
+  // Open the day scrolled to the working hours instead of midnight
+  useEffect(() => {
+    if (bodyRef.current) bodyRef.current.scrollTop = DEFAULT_START_HOUR * HOUR_HEIGHT;
+  }, []);
+
   // Escape closes the modal
   useEffect(() => {
     if (!pendingEntry) return;
@@ -201,18 +236,32 @@ export default function DayView({
 
   const confirmEntry = (e) => {
     e.preventDefault();
-    if (!pendingEntry || draftCategoryId === '') return;
+    if (!pendingEntry || draftCategoryId === '' || !isRangeValid) return;
 
-    onAddEntry({
+    const fields = {
       categoryId: Number(draftCategoryId),
-      date: selectedDate,
-      duration: pendingEntry.end - pendingEntry.start,
+      duration: draftDuration,
       description: draftDescription,
-      startTime: toTimeString(pendingEntry.start),
-      endTime: toTimeString(pendingEntry.end),
+      startTime: draftStart,
+      endTime: draftEnd,
       done: draftDone,
-      completedAt: draftDone ? new Date().toISOString() : null,
-    });
+    };
+
+    if (editingId !== null) {
+      const existing = entries.find((entry) => entry.id === editingId);
+      // Only restamp completedAt when the done state actually flipped, so
+      // editing a done entry keeps its original completion time.
+      if ((existing?.done ?? true) !== draftDone) {
+        fields.completedAt = draftDone ? new Date().toISOString() : null;
+      }
+      onUpdateEntry(editingId, fields);
+    } else {
+      onAddEntry({
+        ...fields,
+        completedAt: draftDone ? new Date().toISOString() : null,
+        date: selectedDate,
+      });
+    }
 
     setPendingEntry(null);
   };
@@ -244,6 +293,9 @@ export default function DayView({
 
   const hours = Array.from({ length: 24 }, (_, i) => i);
   const pendingCategory = categories.find((c) => c.id === Number(draftCategoryId));
+  // "00:00" as an end time reads as midnight-before, so it never passes this check
+  const draftDuration = fromTimeString(draftEnd) - fromTimeString(draftStart);
+  const isRangeValid = draftDuration > 0;
 
   return (
     <div className="day-view">
@@ -257,7 +309,7 @@ export default function DayView({
         </div>
       </div>
 
-      <div className="day-view-body">
+      <div className="day-view-body" ref={bodyRef}>
         <div className="time-gutter">
           {hours.map((hour) => (
             <div key={hour} className="time-label" style={{ height: `${HOUR_HEIGHT}px` }}>
@@ -291,7 +343,7 @@ export default function DayView({
 
           {dayEntries.map((entry) => {
             const category = categories.find((c) => c.id === entry.categoryId);
-            const color = category?.color || '#888';
+            const color = category?.color || '#6f6a62';
             const done = entry.done ?? true;
             return (
               <div
@@ -317,7 +369,12 @@ export default function DayView({
                 >
                   {done ? '✓' : ''}
                 </button>
-                <div className="entry-content">
+                <button
+                  type="button"
+                  className="entry-content"
+                  onClick={() => openEditor(entry)}
+                  title="Edit entry"
+                >
                   <div className="entry-title">{category?.name || 'Unknown'}</div>
                   <div className="entry-time">
                     {entry.startTime}–{entry.endTime} · {entry.duration.toFixed(2)}h
@@ -326,7 +383,7 @@ export default function DayView({
                   {entry.description && (
                     <div className="entry-desc">{entry.description}</div>
                   )}
-                </div>
+                </button>
                 <button
                   className="delete-btn"
                   onClick={() => onDeleteEntry(entry.id)}
@@ -347,13 +404,41 @@ export default function DayView({
             onPointerDown={(e) => e.stopPropagation()}
             onSubmit={confirmEntry}
           >
-            <h3>New entry</h3>
-            <p className="modal-time">
-              {toTimeString(pendingEntry.start)} – {toTimeString(pendingEntry.end)}
+            <h3>{editingId !== null ? 'Edit entry' : 'New entry'}</h3>
+            <div className="modal-time-row">
+              <div className="modal-time-field">
+                <label className="modal-label" htmlFor="draft-start">
+                  Start
+                </label>
+                <input
+                  id="draft-start"
+                  className="modal-input modal-time-input"
+                  type="time"
+                  step="60"
+                  value={draftStart}
+                  onChange={(e) => setDraftStart(e.target.value)}
+                />
+              </div>
+              <div className="modal-time-field">
+                <label className="modal-label" htmlFor="draft-end">
+                  End
+                </label>
+                <input
+                  id="draft-end"
+                  className="modal-input modal-time-input"
+                  type="time"
+                  step="60"
+                  value={draftEnd}
+                  onChange={(e) => setDraftEnd(e.target.value)}
+                />
+              </div>
               <span className="modal-duration">
-                ({(pendingEntry.end - pendingEntry.start).toFixed(2)}h)
+                {isRangeValid ? `${draftDuration.toFixed(2)}h` : '—'}
               </span>
-            </p>
+            </div>
+            {!isRangeValid && (
+              <p className="modal-error">End time must be after the start time.</p>
+            )}
 
             <label className="modal-label">Category</label>
             <div className="category-options">
@@ -366,7 +451,7 @@ export default function DayView({
                     borderColor: cat.color,
                     backgroundColor:
                       Number(draftCategoryId) === cat.id ? cat.color : 'transparent',
-                    color: Number(draftCategoryId) === cat.id ? '#fff' : '#333',
+                    color: Number(draftCategoryId) === cat.id ? '#fff' : '#2b2926',
                   }}
                   onClick={() => setDraftCategoryId(cat.id)}
                 >
@@ -417,10 +502,10 @@ export default function DayView({
               <button
                 type="submit"
                 className="btn-save"
-                style={{ backgroundColor: pendingCategory?.color || '#4285f4' }}
-                disabled={draftCategoryId === ''}
+                style={{ backgroundColor: pendingCategory?.color || '#8b1e2d' }}
+                disabled={draftCategoryId === '' || !isRangeValid}
               >
-                {draftDone ? 'Log as done' : 'Add to plan'}
+                {editingId !== null ? 'Save' : draftDone ? 'Log as done' : 'Add to plan'}
               </button>
             </div>
           </form>

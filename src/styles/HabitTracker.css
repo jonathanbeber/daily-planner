@@ -1,8 +1,8 @@
 .habit-tracker {
-  background: white;
-  border-radius: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
   padding: 2rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .tracker-header {
@@ -11,21 +11,23 @@
   align-items: center;
   margin-bottom: 2rem;
   padding-bottom: 1rem;
-  border-bottom: 2px solid #f0f0f0;
+  border-bottom: 1px solid var(--border);
 }
 
 .tracker-header h2 {
   margin: 0;
-  color: #333;
-  font-size: 1.5rem;
+  color: var(--text);
+  font-size: 1.15rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
 }
 
 .habit-form {
-  background: #f8f9fa;
+  background: var(--surface-2);
   padding: 1.5rem;
-  border-radius: 8px;
+  border-radius: var(--radius);
   margin-bottom: 2rem;
-  border: 2px solid #e0e0e0;
+  border: 1px solid var(--border);
 }
 
 .quick-icons {
@@ -35,8 +37,11 @@
 .quick-icons label {
   display: block;
   margin-bottom: 1rem;
+  font-size: 0.72rem;
   font-weight: 500;
-  color: #333;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-light);
 }
 
 .icon-grid {
@@ -48,17 +53,17 @@
 
 .icon-btn {
   padding: 0.75rem;
-  background: white;
-  border: 2px solid #ddd;
-  border-radius: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
   font-size: 1.5rem;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .icon-btn:hover {
-  border-color: #3498db;
-  background: #f0f7ff;
+  border-color: var(--border-strong);
+  background: var(--surface-2);
 }
 
 .habits-grid {
@@ -73,17 +78,16 @@
   align-items: center;
   gap: 1rem;
   padding: 1.5rem;
-  background: #fafafa;
-  border-radius: 12px;
+  background: var(--surface);
+  border-radius: var(--radius);
   text-align: center;
-  transition: all 0.3s ease;
-  border: 2px solid transparent;
+  transition: all 0.2s ease;
+  border: 1px solid var(--border);
 }
 
 .habit-card:hover {
-  background: #fff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border-color: #3498db;
+  background: var(--surface-2);
+  border-color: var(--border-strong);
 }
 
 .habit-toggle {
@@ -96,10 +100,10 @@
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  border: 3px solid #ddd;
-  background: white;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -107,14 +111,14 @@
 }
 
 .habit-btn:hover {
-  border-color: #3498db;
-  transform: scale(1.05);
+  border-color: var(--text-light);
 }
 
 .habit-btn.completed {
-  background: #d4edda;
-  border-color: #27ae60;
-  color: #155724;
+  background: var(--surface-2);
+  border-color: var(--success);
+  border-width: 2px;
+  color: var(--text);
 }
 
 .habit-icon {
@@ -131,9 +135,9 @@
 
 .habit-name {
   margin: 0;
-  color: #333;
-  font-weight: 600;
-  font-size: 0.95rem;
+  color: var(--text);
+  font-weight: 500;
+  font-size: 0.9rem;
   word-break: break-word;
 }
 
@@ -144,7 +148,7 @@
 
 .empty-message {
   text-align: center;
-  color: #999;
+  color: var(--text-lighter);
   padding: 2rem;
   grid-column: 1 / -1;
 }
@@ -180,21 +184,23 @@
 .done-count {
   margin-left: 0.75rem;
   padding: 0.15rem 0.55rem;
+  border: 1px solid var(--border);
   border-radius: 999px;
-  background: #eef6ee;
-  color: #2e7d32;
-  font-size: 0.75rem;
-  font-weight: 600;
+  background: transparent;
+  color: var(--text-light);
+  font-size: 0.7rem;
+  font-weight: 400;
+  letter-spacing: 0.04em;
   vertical-align: middle;
 }
 
 .habit-card.is-complete {
-  border-color: #2ecc71;
-  background: #f6fdf8;
+  border-color: var(--success);
+  background: var(--surface-2);
 }
 
 .habit-count {
   margin: 0.15rem 0 0;
   font-size: 0.7rem;
-  color: #aaa;
+  color: var(--text-lighter);
 }

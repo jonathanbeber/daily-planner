@@ -150,7 +150,9 @@ export default function HabitTracker({
               </div>
               <button
                 className="btn btn-small btn-delete"
-                onClick={() => onDeleteHabit(habit.id)}
+                onClick={() => {
+                  if (window.confirm(`Delete habit "${habit.name}"?`)) onDeleteHabit(habit.id);
+                }}
               >
                 ×
               </button>
